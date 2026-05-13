@@ -26,7 +26,7 @@ Para cada evento são extraídos:
 **1. Clone o repositório:**
 
 ```bash
-git clone git@github.com:heylouiz/eventos-cotil.git
+git clone https://github.com/heylouiz/eventos-cotil.git
 cd eventos-cotil
 ```
 

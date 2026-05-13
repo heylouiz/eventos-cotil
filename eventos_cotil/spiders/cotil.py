@@ -11,7 +11,9 @@ class CotilSpider(scrapy.Spider):
         super().__init__(*args, **kwargs)
         self.max_pages = int(max_pages) if max_pages is not None else None
 
-    def parse(self, response, page=1):
+    def parse(self, response):
+        page = response.meta.get("page", 1)
+
         for item in response.css("div.rtin-item"):
             day = item.css(".rtin-calender h3::text").get("").strip()
             month = item.css(".rtin-calender p::text").get("").strip()
@@ -34,7 +36,7 @@ class CotilSpider(scrapy.Spider):
 
         next_page = response.css(".pagination-area li.active + li a::attr(href)").get()
         if next_page:
-            yield response.follow(next_page, self.parse, cb_kwargs={"page": page + 1})
+            yield response.follow(next_page, self.parse, meta={"page": page + 1})
 
     def parse_event(self, response):
         item = EventoItem()

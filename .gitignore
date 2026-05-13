@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.scrapy/
+*.json
+!requirements*.txt
+.claude/settings.local.json

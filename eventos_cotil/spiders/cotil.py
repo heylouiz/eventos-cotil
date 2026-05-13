@@ -7,7 +7,11 @@ class CotilSpider(scrapy.Spider):
     allowed_domains = ["cotil.unicamp.br"]
     start_urls = ["https://www.cotil.unicamp.br/eventos"]
 
-    def parse(self, response):
+    def __init__(self, max_pages=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.max_pages = int(max_pages) if max_pages is not None else None
+
+    def parse(self, response, page=1):
         for item in response.css("div.rtin-item"):
             day = item.css(".rtin-calender h3::text").get("").strip()
             month = item.css(".rtin-calender p::text").get("").strip()
@@ -21,12 +25,16 @@ class CotilSpider(scrapy.Spider):
                     "title": title,
                     "date_label": f"{day} de {month} de {year}",
                     "time_text": time_text,
+                    "page": page,
                 }
                 yield response.follow(url, self.parse_event, meta=meta)
 
+        if self.max_pages is not None and page >= self.max_pages:
+            return
+
         next_page = response.css(".pagination-area li.active + li a::attr(href)").get()
         if next_page:
-            yield response.follow(next_page, self.parse)
+            yield response.follow(next_page, self.parse, cb_kwargs={"page": page + 1})
 
     def parse_event(self, response):
         item = EventoItem()
@@ -49,5 +57,6 @@ class CotilSpider(scrapy.Spider):
         item["time_start"] = info.get("Horário de Início", "")
         item["date_end"] = info.get("Data de Fim", "")
         item["time_end"] = info.get("Horário de Fim", "")
+        item["page"] = response.meta["page"]
 
         yield item

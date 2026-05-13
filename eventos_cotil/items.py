@@ -9,3 +9,4 @@ class EventoItem(scrapy.Item):
     time_start = scrapy.Field()
     time_end = scrapy.Field()
     categories = scrapy.Field()
+    page = scrapy.Field()
